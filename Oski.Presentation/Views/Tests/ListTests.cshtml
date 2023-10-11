@@ -1,0 +1,13 @@
+﻿@* @model IEnumerable<GetAllTestsDto>
+
+<h2>Available Tests</h2>
+
+<ul>
+    @foreach(var test in Model)
+    {
+        <li>
+            <a href="@Url.Action("StartTest", new { testId = test.Id })">@test.Title</a>
+        </li>
+    }
+</ul>
+ *@

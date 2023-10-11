@@ -1,0 +1,29 @@
+﻿@* @model TestViewModel  
+
+<h2>@Model.TestTitle</h2>
+
+<form id="testForm">
+    @foreach (var question in Model.Questions)
+    {
+        <div class="question">
+            <h4>@question.Text</h4>
+            @foreach (var answer in question.PossibleAnswers)
+            {
+                <label>
+                    <input type="radio" name="@question.Id" value="@answer.Id" required /> @answer.Text
+                </label><br />
+            }
+        </div>
+    }
+    <input type="button" value="Submit Test" id="submitTestBtn" />
+</form>
+
+<script>
+    
+    document.getElementById('submitTestBtn').addEventListener('click', function() {
+        var formData = new FormData(document.getElementById('testForm'));
+
+       
+    });
+</script>
+ *@
