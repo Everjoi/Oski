@@ -2,10 +2,9 @@
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Oski.Application.Features.Tests.Queries;
-using Oski.Application.Features.Tests.Queries.DTOsQueries;
 using Oski.Application.Interfaces;
 using Oski.Domain.Entities;
+using System.Data;
 using System.Security.Claims;
 
 namespace Oski.Presentation.Controllers
@@ -53,11 +52,11 @@ namespace Oski.Presentation.Controllers
         }
 
         [HttpPost("finish/{attemptId}")]
-        public IActionResult FinishTest(Guid attemptId)
+        public IActionResult FinishTest(Guid attemptId,Guid testId)
         {
             var userId = Guid.Parse(User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value);
 
-            var score = _testService.FinishTest(userId,attemptId);
+            var score = _testService.FinishTest(userId,attemptId,testId);
 
             if(score < 0)
                 return BadRequest("Could not finish the test or invalid attempt.");
@@ -69,12 +68,24 @@ namespace Oski.Presentation.Controllers
         [HttpGet("all")]
         public async Task<IActionResult> GetAllTests()
         {
-            var tests = await _mediator.Send(new GetAllTestsQuery());
-  
+            var tests = _testService.GetAllTest();
             if(tests == null || !tests.Any())
                 return NotFound("No tests found.");
 
-            return Ok(tests);
+            return Ok(tests); 
+        }
+
+
+        [HttpGet("take/{testId}")]
+        public IActionResult TakeTest(Guid testId)
+        {
+            var actorClaim = HttpContext.User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Actor);
+
+            if(actorClaim == null)
+                return BadRequest("Something went wrong");
+
+            var userId = Guid.Parse(actorClaim.Value);
+            return Ok(_testService.StartTest(userId,testId));  
         }
 
 

@@ -1,4 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
+using Microsoft.IdentityModel.Tokens;
 using Oski.Domain.Common;
 using Oski.Domain.Common.Interfaces;
 using Oski.Domain.Entities;
@@ -6,24 +8,44 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Hosting;
+
 
 namespace Oski.Persistance.Contexts
 {
     public class AppDataContext : DbContext
     {
+        private readonly string _connectionString;
+        private readonly IHostingEnvironment _environment;
 
-        public AppDataContext(DbContextOptions<AppDataContext> options)
+        public AppDataContext( DbContextOptions<AppDataContext> options, IConfiguration configuration,IHostingEnvironment environment)
             : base(options)
         {
+            _connectionString = GetConnectionString(configuration);
+            _environment = environment;
         }
+
+        public AppDataContext(DbContextOptions<AppDataContext> options)
+            : base(options) { }
+
+        public AppDataContext() : base() { }
+
+
+        public static string GetConnectionString(IConfiguration configuration)
+        {
+            return configuration.GetConnectionString("DefaultConnection");
+        }
+
 
         public DbSet<User> Users => Set<User>();
         public DbSet<Test> Tests => Set<Test>();
         public DbSet<Question> Questions => Set<Question>();
         public DbSet<Answer> Answers => Set<Answer>();
         public DbSet<UserTestAttempt> TestAttempts => Set<UserTestAttempt>();
+        public DbSet<UserAnswer> UserAnswers => Set<UserAnswer>();
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -60,7 +82,9 @@ namespace Oski.Persistance.Contexts
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            optionsBuilder.UseSqlServer("Data Source=(localdb)\\MSSQLLocalDB;Initial Catalog=OskiDb;Integrated Security=True;Connect Timeout=30;Encrypt=False;Trust Server Certificate=False;Application Intent=ReadWrite;Multi Subnet Failover=False"); // TODO: don`t forget get connection string from appsettings or create yaml 
+
+            //optionsBuilder.UseInMemoryDatabase("OskiDb");  // For Tests
+            optionsBuilder.UseSqlServer(_connectionString);   // For Development
         }
 
 

@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Oski.Domain.Entities
 {
-    public class UserTestAttempt : IEntity
+    public class UserTestAttempt:IEntity
     {
         public Guid Id { get; set; }
         public Guid UserId { get; set; }

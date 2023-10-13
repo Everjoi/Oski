@@ -83,13 +83,20 @@ namespace Oski.Persistance.Repository
         protected virtual void Dispose(bool disposing)
         {
             if(disposed)
+                return;
+
+            if(disposing)
             {
-                if(disposing)
-                {
-                    _dbContext.Dispose();
-                }
+                _dbContext.Dispose();
             }
             disposed = true;
         }
+
+
+
+
+
+
+
     }
 }

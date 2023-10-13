@@ -9,6 +9,6 @@ namespace Oski.Application.Interfaces
     public interface IAuthenticationService
     {
         string Authenticate(string email,string password);
-        bool Register(string name, string email,string password);
+        Task<Guid> Register(string name, string email,string password);
     }
 }

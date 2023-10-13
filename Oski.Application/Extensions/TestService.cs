@@ -1,4 +1,5 @@
-﻿using Oski.Application.Interfaces;
+﻿using Microsoft.IdentityModel.Tokens;
+using Oski.Application.Interfaces;
 using Oski.Application.Interfaces.Repositories;
 using Oski.Domain.Entities;
 using Oski.Domain.Exceptions;
@@ -28,7 +29,7 @@ namespace Oski.Application.Extensions
             var existingAttempt = _unitOfWork.Repository<UserTestAttempt>().Entities
                 .FirstOrDefault(x => x.UserId == userId && x.TestId == testId && x.IsCompleted == false);
 
-            if(existingAttempt != null || _unitOfWork.Repository<Test>().GetByIdAsync(testId) == null)
+            if(existingAttempt != null || _unitOfWork.Repository<Test>().GetByIdAsync(testId).Result == null)
                 throw new CompletedTestExcetion(userId);
 
 
@@ -53,10 +54,19 @@ namespace Oski.Application.Extensions
             if(attempt == null)
                 return false;
 
+            var userAnswer = new Answer
+            {
+                Id = answerId, 
+                QuestionId = questionId,
+            };
+
+            _unitOfWork.Repository<Answer>().AddAsync(userAnswer);  
+            _unitOfWork.Save(userId,default);  
+
             return true;
         }
 
-        public int FinishTest(Guid userId,Guid attemptId)
+        public int FinishTest(Guid userId,Guid attemptId, Guid testId)
         {
             var attempt = _unitOfWork.Repository<UserTestAttempt>().Entities
                 .FirstOrDefault(x => x.UserId == userId && x.Id == attemptId && x.IsCompleted == false);
@@ -69,7 +79,99 @@ namespace Oski.Application.Extensions
             _unitOfWork.Repository<UserTestAttempt>().UpdateAsync(attempt);
             _unitOfWork.Save(userId,default);
 
-            return attempt.Score;
+
+            var test = _unitOfWork.Repository<Test>().Entities
+                .FirstOrDefault(x => x.Id == testId);
+
+
+            return CalculateScore(attemptId,test.MaxScore);
         }
+
+        
+
+        public void RegisterUserAnswer(Guid attemptId,Guid answerId)
+        {
+            var attempt = _unitOfWork.Repository<UserTestAttempt>().Entities
+                .FirstOrDefault(x => x.Id == attemptId);
+
+            if(attempt == null)
+                throw new InvalidOperationException("Attempt not found.");
+
+            var selectedAnswer = _unitOfWork.Repository<Answer>().Entities
+                .FirstOrDefault(a => a.Id == answerId);
+
+            if(selectedAnswer == null)
+                throw new InvalidOperationException("Answer not found.");
+
+
+            var userAnswer = new UserAnswer
+            {
+                AttemptId = attemptId,
+                AnswerId = answerId,
+                IsCorrect = selectedAnswer.IsCorrect
+            };
+
+            _unitOfWork.Repository<UserAnswer>().AddAsync(userAnswer);
+            _unitOfWork.Save(default,default);
+        }
+
+
+        public int CalculateScore(Guid attemptId, int maxScore)
+        {
+
+            var userAnswers = _unitOfWork.Repository<UserAnswer>().Entities
+                .Where(x => x.AttemptId == attemptId).ToList();
+
+            if(!userAnswers.Any())
+                throw new InvalidOperationException("No answers found for this attempt.");
+
+
+            int correctAnswersCount = userAnswers.Count(ua => ua.IsCorrect);
+
+
+            var attempt = _unitOfWork.Repository<UserTestAttempt>().Entities
+                .FirstOrDefault(x => x.Id == attemptId);
+
+            if(attempt == null)
+                throw new InvalidOperationException("Attempt not found.");
+
+
+
+            double percentageCorrect = (double)correctAnswersCount / userAnswers.Count;
+            int score = (int)(percentageCorrect * maxScore);
+
+             
+            attempt.Score = score;
+            _unitOfWork.Repository<UserTestAttempt>().UpdateAsync(attempt);
+            _unitOfWork.Save(default,default);
+
+            return score;  
+        }
+
+
+
+        public IEnumerable<Test> GetAllTest()
+        {
+            var tests = _unitOfWork.Repository<Test>().Entities.AsEnumerable();
+
+            if(tests.IsNullOrEmpty())
+                throw new NotFoundException();
+
+            return tests;
+        }
+
+
+
+        public  Test GetTestById(Guid testid)
+        {
+            var test =  _unitOfWork.Repository<Test>().GetByIdAsync(testid);
+
+            if(test.Result==null)
+                throw new NotFoundException();
+
+            return test.Result;
+        }
+
+
     }
 }

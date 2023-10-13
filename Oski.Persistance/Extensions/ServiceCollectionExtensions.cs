@@ -11,6 +11,8 @@ using Oski.Persistance.Repository;
 using Microsoft.Extensions.Configuration;
 using Oski.Application.Interfaces;
 using Oski.Application.Extensions;
+using Autofac;
+using Microsoft.AspNetCore.Hosting;
 
 namespace Oski.Persistance.Extensions
 {
@@ -19,7 +21,7 @@ namespace Oski.Persistance.Extensions
         public static void AddPersistenceLayer(this IServiceCollection services, IConfiguration configuration)
         {
             services.AddDbContext(configuration);
-            services.AddRepositories();
+            //services.AddRepositories();
         }
 
  
@@ -33,15 +35,35 @@ namespace Oski.Persistance.Extensions
                    builder => builder.MigrationsAssembly(typeof(AppDataContext).Assembly.FullName)));
         }
 
+
+
+
+
+
         private static void AddRepositories(this IServiceCollection services)
-        {
-            services
-                .AddTransient(typeof(IUnitOfWork),typeof(UnitOfWork))
-                .AddTransient(typeof(IGenericRepository<>),typeof(GenericRepository<>))
-                .AddTransient<IUserRepository,UserRepository>()
-                .AddTransient<ITestService,TestService>()
-                .AddTransient<ITestRepository,TestRepository>();
+        { 
+
+            //services
+            //    .AddTransient(typeof(IUnitOfWork),typeof(UnitOfWork))
+            //    //.AddTransient(typeof(IGenericRepository<>),typeof(GenericRepository<>))
+            //    //.AddTransient<IUserRepository,UserRepository>()
+            //    //.AddTransient<ITestService,TestService>()
+            //    //.AddTransient<ITestRepository,TestRepository>()
+            //    .AddScoped<AppDataContext>();
+
         }
 
     }
+    public class ConteinerDI : Module
+    {
+        protected override void Load(ContainerBuilder builder)
+        {
+            builder.RegisterType<TestRepository>().As<ITestRepository>().InstancePerLifetimeScope();
+            builder.RegisterType<TestService>().As<ITestService>().InstancePerLifetimeScope();
+            builder.RegisterType<AppDataContext>().AsSelf().InstancePerLifetimeScope();
+            builder.RegisterGeneric(typeof(GenericRepository<>)).As(typeof(IGenericRepository<>)).InstancePerLifetimeScope();
+            builder.RegisterType<UnitOfWork>().As<IUnitOfWork>().InstancePerLifetimeScope();
+        }
+    }
+
 }

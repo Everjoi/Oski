@@ -3,13 +3,21 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.7.34031.279
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Oski.Domain", "Oski.Domain\Oski.Domain.csproj", "{0D8CC888-96EA-4BDA-8C0B-B5F0269EC679}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Oski.Domain", "Oski.Domain\Oski.Domain.csproj", "{0D8CC888-96EA-4BDA-8C0B-B5F0269EC679}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Oski.Presentation", "Oski.Presentation\Oski.Presentation.csproj", "{E386456A-37C6-464B-93A8-BBA8F6AAB855}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Oski.Presentation", "Oski.Presentation\Oski.Presentation.csproj", "{E386456A-37C6-464B-93A8-BBA8F6AAB855}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Oski.Application", "Oski.Application\Oski.Application.csproj", "{7ED999BC-8C05-4E10-AB6E-C394B56D225B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Oski.Application", "Oski.Application\Oski.Application.csproj", "{7ED999BC-8C05-4E10-AB6E-C394B56D225B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Oski.Persistance", "Oski.Persistance\Oski.Persistance.csproj", "{9D991A57-C7E0-4B6D-883A-C749813F46FF}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Oski.Persistance", "Oski.Persistance\Oski.Persistance.csproj", "{9D991A57-C7E0-4B6D-883A-C749813F46FF}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Oski.UnitTest", "Oski.UnitTest\Oski.UnitTest.csproj", "{02BF6FC5-6C65-468F-98FE-18691F6FE758}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Oski.IntegrationTest", "Oski.IntegratedTest\Oski.IntegrationTest.csproj", "{80CC431A-12C4-41F2-8AEC-334A3E670603}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Oski.Test", "Oski.Test", "{E02A79FB-05A4-4346-BB09-9AE701896EC7}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Oski.Core", "Oski.Core", "{81513C10-5EEC-4B40-B38B-A9997DECF828}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -33,9 +41,23 @@ Global
 		{9D991A57-C7E0-4B6D-883A-C749813F46FF}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{9D991A57-C7E0-4B6D-883A-C749813F46FF}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{9D991A57-C7E0-4B6D-883A-C749813F46FF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{02BF6FC5-6C65-468F-98FE-18691F6FE758}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{02BF6FC5-6C65-468F-98FE-18691F6FE758}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{02BF6FC5-6C65-468F-98FE-18691F6FE758}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{02BF6FC5-6C65-468F-98FE-18691F6FE758}.Release|Any CPU.Build.0 = Release|Any CPU
+		{80CC431A-12C4-41F2-8AEC-334A3E670603}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{80CC431A-12C4-41F2-8AEC-334A3E670603}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{80CC431A-12C4-41F2-8AEC-334A3E670603}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{80CC431A-12C4-41F2-8AEC-334A3E670603}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{0D8CC888-96EA-4BDA-8C0B-B5F0269EC679} = {81513C10-5EEC-4B40-B38B-A9997DECF828}
+		{7ED999BC-8C05-4E10-AB6E-C394B56D225B} = {81513C10-5EEC-4B40-B38B-A9997DECF828}
+		{02BF6FC5-6C65-468F-98FE-18691F6FE758} = {E02A79FB-05A4-4346-BB09-9AE701896EC7}
+		{80CC431A-12C4-41F2-8AEC-334A3E670603} = {E02A79FB-05A4-4346-BB09-9AE701896EC7}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {521422D7-F081-4370-B4D1-6D8BAE78B93C}

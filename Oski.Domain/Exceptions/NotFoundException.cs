@@ -9,7 +9,7 @@ namespace Oski.Domain.Exceptions
     public class NotFoundException : Exception
     {
 
-        public NotFoundException(Guid id) : base($"User {id} not foud")
+        public NotFoundException() : base($"Entity not foud")
         {
                 
         }

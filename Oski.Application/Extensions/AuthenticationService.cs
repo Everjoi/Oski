@@ -15,14 +15,13 @@ using System.Security.Cryptography;
 
 namespace Oski.Application.Extensions
 {
-    public class AuthenticationService:IAuthenticationService
+    public class AuthenticationService: IAuthenticationService
     {
         private readonly IGenericRepository<User> _userRepository; 
         private readonly IConfiguration _configuration;
         private readonly IUnitOfWork _unitOfWork;
 
 
-        // TODO: use IMediator and cqrs pattern
         public AuthenticationService(IConfiguration configuration, IUnitOfWork unitOfWork)
         {
             
@@ -37,7 +36,6 @@ namespace Oski.Application.Extensions
         {
             var user = _userRepository.GetAllAsync().Result.Where(x=>x.Email == email).FirstOrDefault();
 
-
             if(user == null)
                 return null;
 
@@ -51,7 +49,8 @@ namespace Oski.Application.Extensions
             {
                 Subject = new ClaimsIdentity(new Claim[]
                 {
-                    new Claim(ClaimTypes.Name, user.Id.ToString())
+                    new Claim(ClaimTypes.Name, user.Id.ToString()),
+                    new Claim(ClaimTypes.Actor, user.Id.ToString())
                 }),
                 Expires = DateTime.UtcNow.AddDays(7), 
                 SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key),SecurityAlgorithms.HmacSha256Signature)
@@ -61,22 +60,25 @@ namespace Oski.Application.Extensions
             return tokenHandler.WriteToken(token);
         }
 
-        public bool Register(string name,string email,string password)
+
+
+        public async Task<Guid> Register(string name,string email,string password)
         {
+            var existingUser = await _unitOfWork.Repository<User>().GetAllAsync();
+            if(existingUser.Any(x => x.Email == email))
+                return Guid.Empty;
 
-            var existingUser = _unitOfWork.Repository<User>().GetAllAsync().Result.Find(x=>x.Email == email);
-            if(existingUser != null)
-                return false; 
+            var hashedPassword = HashPassword(password);
 
-            var hashedPassword = HashPassword(password); 
+            var user = new User {Id = Guid.NewGuid(), FullName = name,Email = email,Password = hashedPassword };
 
-            var user = new User { FullName = name,Email = email, Password = hashedPassword };
-            
-            _userRepository.AddAsync(user);
-            _unitOfWork.Save(user.Id,default);
+            await _userRepository.AddAsync(user);
+            await _unitOfWork.Save(user.Id,default);
 
-            return true;  
+            var t = user.Id;
+            return user.Id;
         }
+
 
         private string HashPassword(string password)
         {

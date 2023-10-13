@@ -2,6 +2,7 @@
 using Oski.Application.Interfaces.Repositories;
 using Oski.Domain.Common;
 using Oski.Domain.Common.Interfaces;
+using Oski.Domain.Exceptions;
 using Oski.Persistance.Contexts;
 using System;
 using System.Collections.Generic;
@@ -50,7 +51,12 @@ namespace Oski.Persistance.Repository
 
         public async Task<T> GetByIdAsync(Guid id)
         {
-            return await _dbContext.Set<T>().FindAsync(id);
+            var result = await _dbContext.Set<T>().FindAsync(id);
+            
+            if(result == null)
+                throw new NotFoundException();
+
+            return result;
         }
     }
 }
